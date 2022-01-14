@@ -25,7 +25,27 @@ const UserSchema = new Schema(
             type: String,
             required: true
         },
+        age:{
+            type: Number,
+            required: true
+        },        
+        address:{
+            type: String,
+            required: true
+        },
+        city:{
+            type: String,
+            required: true
+        },
+        pincode:{
+            type: Number,
+            required: true
+        },
         user_status:{
+            type: String,
+            required: true
+        },
+        expertize:{
             type: String,
             required: true
         }

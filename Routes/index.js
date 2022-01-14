@@ -9,12 +9,15 @@ const LawyerController = require('../Controllers/LawyerController');
 
 // Routes
 
-router.post('/registerUser', UserController.registerUser);
-router.post('/login', UserController.loginUser);
-router.get('/usersByRole/:role', UserController.getUsersByRole);
+router.post('/user/registerUser', UserController.registerUser);
+router.post('/user/login', UserController.loginUser);
+router.get('/user/usersByRole/:role', UserController.getUsersByRole);
 
-router.post('/ipcLaw', AdminController.updateIPCLaw);
-router.get('/ipcLaws', AdminController.getIPCLaws);
+router.post('/laws/ipcLaw', AdminController.updateIPCLaw);
+router.get('/laws/ipcLaws', AdminController.getIPCLaws);
+
+router.post('/court/courts', AdminController.udateCourtDetails);
+router.get('/court/courts', AdminController.getListOfCourts);
 
 
 
