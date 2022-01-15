@@ -11,16 +11,18 @@ const port = process.env.PORT || 5001;
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(bodyParser.json());
-app.use('/', routes);
-app.use((request, response) => {
+app.use((request, response, next) => {
     response.setHeader('Access-Control-Allow-Origin', '*');
     response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
 
+app.use('/', routes);
+
 mongoose.connect(
-    'mongodb+srv://team8:Team8Go@cluster0.t6yet.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+    // 'mongodb+srv://team8:Team8Go@cluster0.t6yet.mongodb.net/OnlineLawSystem?retryWrites=true&w=majority',
+    'mongodb+srv://team8:Team8Go@cluster0.et3ws.mongodb.net/OnlineLawSystem?retryWrites=true&w=majority',
     {
         useNewUrlParser: true,
         useUnifiedTopology: true

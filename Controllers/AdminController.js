@@ -82,6 +82,15 @@ exports.updateIPCLaw = (request, response) => {
 exports.getIPCLaws = (request, response) => {
     console.log("Fetch IPC Laws begins");
     IPCLawDetails.find().then(result => {
+        console.log("IPC laws result: ", result);
+        if(result.length <= 0){
+            response.status(200).json({
+                status: "success",
+                message: 'No Records Found',
+                statusCode: 200
+            });
+            return;
+        }
         response.status(200).json({
             status: "success",
             message: 'IPC Laws fetched successfully',
@@ -116,7 +125,7 @@ exports.udateCourtDetails = (request, response) => {
             });
         }else {
             if (obj != null) {
-                console.log("Court details already persisted", result);
+                console.log("Court details already persisted", obj);
                 response.status(200).json({
                     status: "success",
                     message: "Court details already persisted",
@@ -124,7 +133,7 @@ exports.udateCourtDetails = (request, response) => {
                 });
                 return;
             }
-            CourtDetails.save(function (err, result) {
+            courtDetails.save(function (err, result) {
                 if (err) {
                     console.log("Error in persisting Court details ", err);
                     response.status(500).json({
@@ -153,7 +162,7 @@ exports.getListOfCourts = (request, response) => {
         if(result.length <= 0){
             response.status(200).json({
                 status: "success",
-                message: 'Court details not found',
+                message: 'No Records found',
                 statusCode: 200
             });
             return;
@@ -174,80 +183,3 @@ exports.getListOfCourts = (request, response) => {
     });
 }
 
-exports.verifyLawyer = (request, response) => {
-    console.log("Update IPC Law begins");
-    const ipcLawDetails = new IPCLawDetails(request.body);
-
-    IPCLawDetails.findOne({
-        section_no: ipcLawDetails.section_no
-    }, function (err, obj) {
-        console.log("Existing obj ", obj);
-        if (err) {
-            response.status(500).json({
-                status: "failed",
-                message: "Failed in Validation",
-                statusCode: 500
-            });
-        }else {
-            if (obj != null && (obj.section_no == ipcLawDetails.section_no)) {
-                console.log("Section no. matches");
-                if(obj.description == ipcLawDetails.description){
-                    console.log("IPC Law already persisted");
-                    response.status(200).json({
-                        status: "success",
-                        message: "IPC Law already persisted",
-                        statusCode: 200
-                    });
-                    return;
-                }
-                console.log("Updating IPC Law starts");
-                IPCLawDetails.updateOne({"_id": obj.id}, {description: ipcLawDetails.description}, function (err, result) {
-                    if (err) {
-                        console.log("Error in updating IPC Law ", err);
-                        response.status(500).json({
-                            status: "failed",
-                            message: "Failed to updating IPC Law",
-                            statusCode: 500
-                        });
-                    }
-                    else {
-                        console.log("IPC Law updated successfully", result);
-                        if(result.modifiedCount <= 0){
-                            response.status(500).json({
-                                status: "failed",
-                                message: "Failed to updating IPC Law",
-                                statusCode: 500
-                            });
-                        }else{
-                            response.status(201).json({
-                                status: "success",
-                                message: "IPC Law updated successfully",
-                                statusCode: 201
-                            });
-                        }                        
-                    }
-                });
-            }else{
-                ipcLawDetails.save(function (err, result) {
-                    if (err) {
-                        console.log("Error in persisting IPC Law ", err);
-                        response.status(500).json({
-                            status: "failed",
-                            message: "Failed to persist IPC Law",
-                            statusCode: 500
-                        });
-                    }
-                    else {
-                        console.log("IPC Law persisted successfully", result);
-                        response.status(201).json({
-                            status: "success",
-                            message: "IPC Law persisted successfully",
-                            statusCode: 201
-                        });
-                    }
-                });
-            }            
-        }
-        console.log("Update IPC Law completed");
-    });
-}

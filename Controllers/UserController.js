@@ -10,7 +10,7 @@ exports.registerUser = (request, response) => {
         userDetails.user_status = 'New';
     }else {
         userDetails.user_status = 'Active';
-        userDetails.specialization = 'NA';
+        userDetails.expertize = 'NA';
     }
     userDetails.hashPassword = bcrypt.hashSync(request.body.password, 10);
 
@@ -88,17 +88,25 @@ exports.loginUser = (request, response) => {
             })
         }else{
             console.log("User status :", user.user_status);
-            if (user.comparePassword(request.body.password, user.hashPassword)
-                && user.user_status == 'Active'){
-                    return response.json({
-                        token: jwt.sign({
-                        email: user.email,
-                        name: user.name,
-                        _id: user.id
-                    },
-                    'SecureAPIs'),
-                    role: user.role
-                });
+            if (user.comparePassword(request.body.password, user.hashPassword)){
+                    if(user.user_status == 'Active'){
+                        return response.json({
+                            token: jwt.sign({
+                            email: user.email,
+                            name: user.name,
+                            _id: user.id
+                        },
+                        'SecureAPIs'),
+                        role: user.role
+                    });             
+                    }else{
+                        console.log("User status is inactive");
+                        response.status(403).json({
+                            status: "failed",
+                            message: 'Your account is inactive. Please contact Admin.',                    
+                            statusCode: 403      
+                        });   
+                    }                    
             }else{
                 console.log("Invalid Credentials. Authentiaction failed");
                 response.status(401).json({
@@ -143,82 +151,40 @@ exports.getUsersByRole = (request, response) => {
     });
 }
 
-// Work in progress
 exports.updateUserStatus = (request, response) => {
-    const id = request.params.id;
-    const userStatus = request.params.user_status;
-    console.log("Update IPC Law begins");
+    const id = request.body.id;
+    const userStatus = request.body.user_status;
+    console.log("Update User status begins");
 
-    UserDetails.findOne({
-        section_no: ipcLawDetails.section_no
-    }, function (err, obj) {
-        console.log("Existing obj ", obj);
+    UserDetails.updateOne({
+        "_id": id
+    }, {
+        user_status: userStatus
+    }, function (err, result) {
         if (err) {
+            console.log("Error in updating User status ", err);
             response.status(500).json({
                 status: "failed",
-                message: "Failed in Validation",
+                message: "Failed to updating User status",
                 statusCode: 500
             });
-        }else {
-            if (obj != null && (obj.section_no == ipcLawDetails.section_no)) {
-                console.log("Section no. matches");
-                if(obj.description == ipcLawDetails.description){
-                    console.log("IPC Law already persisted");
-                    response.status(200).json({
-                        status: "success",
-                        message: "IPC Law already persisted",
-                        statusCode: 200
-                    });
-                    return;
-                }
-                console.log("Updating IPC Law starts");
-                IPCLawDetails.updateOne({"_id": obj.id}, {description: ipcLawDetails.description}, function (err, result) {
-                    if (err) {
-                        console.log("Error in updating IPC Law ", err);
-                        response.status(500).json({
-                            status: "failed",
-                            message: "Failed to updating IPC Law",
-                            statusCode: 500
-                        });
-                    }
-                    else {
-                        console.log("IPC Law updated successfully", result);
-                        if(result.modifiedCount <= 0){
-                            response.status(500).json({
-                                status: "failed",
-                                message: "Failed to updating IPC Law",
-                                statusCode: 500
-                            });
-                        }else{
-                            response.status(201).json({
-                                status: "success",
-                                message: "IPC Law updated successfully",
-                                statusCode: 201
-                            });
-                        }                        
-                    }
+        }
+        else {
+            console.log("User update status: ", result);
+            if(result.modifiedCount <= 0){
+                response.status(500).json({
+                    status: "failed",
+                    message: "Failed to updating User status",
+                    statusCode: 500
                 });
             }else{
-                ipcLawDetails.save(function (err, result) {
-                    if (err) {
-                        console.log("Error in persisting IPC Law ", err);
-                        response.status(500).json({
-                            status: "failed",
-                            message: "Failed to persist IPC Law",
-                            statusCode: 500
-                        });
-                    }
-                    else {
-                        console.log("IPC Law persisted successfully", result);
-                        response.status(201).json({
-                            status: "success",
-                            message: "IPC Law persisted successfully",
-                            statusCode: 201
-                        });
-                    }
+                console.log("User updated successfully: ", result);
+                response.status(201).json({
+                    status: "success",
+                    message: "User status updated successfully",
+                    statusCode: 201
                 });
-            }            
+            }                        
         }
-        console.log("Update IPC Law completed");
     });
 }

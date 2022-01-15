@@ -11,13 +11,14 @@ const LawyerController = require('../Controllers/LawyerController');
 
 router.post('/user/registerUser', UserController.registerUser);
 router.post('/user/login', UserController.loginUser);
-router.get('/user/usersByRole/:role', UserController.getUsersByRole);
+router.get('/user/usersByRole/:role/:user_status', UserController.getUsersByRole);
+router.put('/user/userStatus', UserController.updateUserStatus);
 
 router.post('/laws/ipcLaw', AdminController.updateIPCLaw);
 router.get('/laws/ipcLaws', AdminController.getIPCLaws);
 
 router.post('/court/courts', AdminController.udateCourtDetails);
-router.get('/court/courts', AdminController.getListOfCourts);
+router.get('/court/courts/:area', AdminController.getListOfCourts);
 
 
 
