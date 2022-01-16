@@ -1,20 +1,25 @@
 const CaseDetails = require('../Models/CaseDetails');
+const formidable = require('formidable');
 
 exports.fileACaseByPublic = (request, response) => {
     console.log("Filing a case begins");
-    const caseDetails = new CaseDetails();
-    request.on('data', (data) => {
-        console.log("data._public_user_id: ", data._public_user_id.toString());
-        caseDetails._public_user_id = data._public_user_id.toString();
-        caseDetails._lawyer_id = data._lawyer_id;
-        caseDetails._ipc_section_id = data._ipc_section_id;
-        caseDetails.case_description = data.case_description;
-        caseDetails.case_files = data.case_files;
-    });    
+    var caseDetails = new CaseDetails();
+    var form = new formidable.IncomingForm();
+    form.parse(request, function (err, fields, files) {
+        if (err) {
+            console.error(err.message);
+            return;
+        }
+        // Yet to set the values to caseDetails
+        console.log("fields._public_user_id ", fields._public_user_id);
+        console.log("files ", files);
+    });
+
     CaseDetails.findOne({
         _public_user_id: caseDetails._public_user_id,
         _ipc_section_id: caseDetails._ipc_section_id,
     }, function (err, obj) {
+        console.log("case details : ", caseDetails);
         console.log("Existing obj ", obj);
         if (err) {
             response.status(500).json({
@@ -53,6 +58,6 @@ exports.fileACaseByPublic = (request, response) => {
                 }
             });
         }
-    }); 
+    });
 }
 
