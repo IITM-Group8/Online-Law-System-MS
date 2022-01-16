@@ -5,7 +5,8 @@ const router = express.Router();
 // Import Internal Files
 const UserController = require('../Controllers/UserController');
 const AdminController = require('../Controllers/AdminController');
-const LawyerController = require('../Controllers/LawyerController');
+// const LawyerController = require('../Controllers/LawyerController');
+const CaseController = require('../Controllers/CaseController');
 
 // Routes
 
@@ -20,6 +21,6 @@ router.get('/laws/ipcLaws', AdminController.getIPCLaws);
 router.post('/court/courts', AdminController.udateCourtDetails);
 router.get('/court/courts/:area', AdminController.getListOfCourts);
 
-
+router.post('/case/public/fileACase', CaseController.fileACaseByPublic);
 
 module.exports = router;
