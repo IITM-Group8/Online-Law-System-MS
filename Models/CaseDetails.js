@@ -7,19 +7,22 @@ const Schema = mongoose.Schema;
 const CaseSchema = new Schema(
     {
         _public_user_id:{
-            type: Schema.Types.ObjectId,
-            required: true,
-            ref: UserDetails
+            // type: Schema.Types.ObjectId,
+            // ref: UserDetails,
+            type: String,
+            required: true            
         },
         _lawyer_id:{
-            type: Schema.Types.ObjectId,
-            required: true,
-            ref: UserDetails
+            // type: Schema.Types.ObjectId,
+            // ref: UserDetails,
+            type: String,
+            required: true
         },
         _ipc_section_id:{
-            type: Schema.Types.ObjectId,
-            required: true,
-            ref: IPCLawDetails
+            // type: Schema.Types.ObjectId,
+            // ref: IPCLawDetails,
+            type: String,
+            required: true
         },
         case_description:{
             type: String,
