@@ -35,6 +35,14 @@ const CaseSchema = new Schema(
         case_status:{
             type: String,
             required: true
+        },
+        created_time_stamp:{
+            type: Date,
+            required: true
+        },
+        created_date:{
+            type: Date,
+            required: true
         }
     }
 );

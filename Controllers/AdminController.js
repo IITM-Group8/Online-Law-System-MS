@@ -1,5 +1,6 @@
 const IPCLawDetails = require('../Models/IPCLawDetails');
 const CourtDetails = require('../Models/CourtDetails');
+const Commonconstants = require('../Constants/Commonconstants');
 
 exports.updateIPCLaw = (request, response) => {
     console.log("Update IPC Law begins");
@@ -11,7 +12,7 @@ exports.updateIPCLaw = (request, response) => {
         console.log("Existing obj ", obj);
         if (err) {
             response.status(500).json({
-                status: "failed",
+                status: Commonconstants.FAILED,
                 message: "Failed in Validation",
                 statusCode: 500
             });
@@ -21,7 +22,7 @@ exports.updateIPCLaw = (request, response) => {
                 if(obj.description == ipcLawDetails.description){
                     console.log("IPC Law already persisted");
                     response.status(200).json({
-                        status: "success",
+                        status: Commonconstants.SUCCESS,
                         message: "IPC Law already persisted",
                         statusCode: 200
                     });
@@ -32,7 +33,7 @@ exports.updateIPCLaw = (request, response) => {
                     if (err) {
                         console.log("Error in updating IPC Law ", err);
                         response.status(500).json({
-                            status: "failed",
+                            status: Commonconstants.FAILED,
                             message: "Failed to updating IPC Law",
                             statusCode: 500
                         });
@@ -41,13 +42,13 @@ exports.updateIPCLaw = (request, response) => {
                         console.log("IPC Law updated successfully", result);
                         if(result.modifiedCount <= 0){
                             response.status(500).json({
-                                status: "failed",
+                                status: Commonconstants.FAILED,
                                 message: "Failed to updating IPC Law",
                                 statusCode: 500
                             });
                         }else{
                             response.status(201).json({
-                                status: "success",
+                                status: Commonconstants.SUCCESS,
                                 message: "IPC Law updated successfully",
                                 statusCode: 201
                             });
@@ -59,7 +60,7 @@ exports.updateIPCLaw = (request, response) => {
                     if (err) {
                         console.log("Error in persisting IPC Law ", err);
                         response.status(500).json({
-                            status: "failed",
+                            status: Commonconstants.FAILED,
                             message: "Failed to persist IPC Law",
                             statusCode: 500
                         });
@@ -67,7 +68,7 @@ exports.updateIPCLaw = (request, response) => {
                     else {
                         console.log("IPC Law persisted successfully", result);
                         response.status(201).json({
-                            status: "success",
+                            status: Commonconstants.SUCCESS,
                             message: "IPC Law persisted successfully",
                             statusCode: 201
                         });
@@ -85,14 +86,14 @@ exports.getIPCLaws = (request, response) => {
         console.log("IPC laws result: ", result);
         if(result.length <= 0){
             response.status(200).json({
-                status: "success",
+                status: Commonconstants.Commonconstants.SUCCESS,
                 message: 'No Records Found',
                 statusCode: 200
             });
             return;
         }
         response.status(200).json({
-            status: "success",
+            status: Commonconstants.Commonconstants.SUCCESS,
             message: 'IPC Laws fetched successfully',
             laws: result,
             statusCode: 200
@@ -100,7 +101,7 @@ exports.getIPCLaws = (request, response) => {
     }).catch(error => {
         console.log("Failed to fetch IPC Laws. ", error);
         response.status(500).json({
-            status: "failed",
+            status: Commonconstants.Commonconstants.FAILED,
             message: 'Failed to fetch IPC Laws',
             statusCode: 500
         });
@@ -119,7 +120,7 @@ exports.udateCourtDetails = (request, response) => {
         console.log("Existing obj ", obj);
         if (err) {
             response.status(500).json({
-                status: "failed",
+                status: Commonconstants.Commonconstants.FAILED,
                 message: "Failed in Validation",
                 statusCode: 500
             });
@@ -127,7 +128,7 @@ exports.udateCourtDetails = (request, response) => {
             if (obj != null) {
                 console.log("Court details already persisted", obj);
                 response.status(200).json({
-                    status: "success",
+                    status: Commonconstants.Commonconstants.SUCCESS,
                     message: "Court details already persisted",
                     statusCode: 200
                 });
@@ -137,7 +138,7 @@ exports.udateCourtDetails = (request, response) => {
                 if (err) {
                     console.log("Error in persisting Court details ", err);
                     response.status(500).json({
-                        status: "failed",
+                        status: Commonconstants.Commonconstants.FAILED,
                         message: "Failed to persist Court details",
                         statusCode: 500
                     });
@@ -145,7 +146,7 @@ exports.udateCourtDetails = (request, response) => {
                 else {
                     console.log("Court details persisted successfully", result);
                     response.status(201).json({
-                        status: "success",
+                        status: Commonconstants.Commonconstants.SUCCESS,
                         message: "Court details persisted successfully",
                         statusCode: 201
                     });
@@ -161,14 +162,14 @@ exports.getListOfCourts = (request, response) => {
     CourtDetails.find({area: areaForCourt}).then(result => {
         if(result.length <= 0){
             response.status(200).json({
-                status: "success",
+                status: Commonconstants.SUCCESS,
                 message: 'No Records found',
                 statusCode: 200
             });
             return;
         }
         response.status(200).json({
-            status: "success",
+            status: Commonconstants.SUCCESS,
             message: 'Court details fetched successfully',
             courts: result,
             statusCode: 200
@@ -176,7 +177,7 @@ exports.getListOfCourts = (request, response) => {
     }).catch(error => {
         console.log("Failed to fetch Court details. ", error);
         response.status(500).json({
-            status: "failed",
+            status: Commonconstants.FAILED,
             message: `Failed to fetch Court details for ${areaForCourt}`,
             statusCode: 500
         });

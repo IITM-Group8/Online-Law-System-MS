@@ -1,6 +1,7 @@
 const bcrypt = require ('bcrypt');
 const jwt  = require('jsonwebtoken');
 const UserDetails = require('../Models/UserDetails');
+const Commonconstants = require('../Constants/Commonconstants');
 
 exports.registerUser = (request, response) => {
     console.log("Register User begins");
@@ -19,7 +20,7 @@ exports.registerUser = (request, response) => {
     }, function (err, obj) {
         if (err) {
             response.status(500).json({
-                status: "failed",
+                status: Commonconstants.FAILED,
                 message: "Failed in Validation",
                 statusCode: 500
             });
@@ -29,7 +30,7 @@ exports.registerUser = (request, response) => {
             if (obj != null && (obj.role === 'Admin')) {
                 console.log("You are not allowed to be registered as Admin");
                 response.status(409).json({
-                    status: "failed",
+                    status: Commonconstants.FAILED,
                     message: "You are not allowed to be registered as Admin",
                     statusCode: 409
                 });
@@ -39,7 +40,7 @@ exports.registerUser = (request, response) => {
             if (obj != null && (obj.email === userDetails.email)) {
                 console.log("User already registered: ");
                 response.status(409).json({
-                    status: "success",
+                    status: Commonconstants.SUCCESS,
                     message: "User is already registered",
                     statusCode: 409
                 });
@@ -48,7 +49,7 @@ exports.registerUser = (request, response) => {
                     if (err) {
                         console.log("Error in saving User: ", err);
                         response.status(500).json({
-                            status: "failed",
+                            status: Commonconstants.FAILED,
                             message: "User registration failed",
                             statusCode: 500
                         });
@@ -56,7 +57,7 @@ exports.registerUser = (request, response) => {
                     else {
                         console.log("User Registered successfully: ", result);
                         response.status(201).json({
-                            status: "success",
+                            status: Commonconstants.SUCCESS,
                             message: "User Registered successfully",
                             statusCode: 201
                         });
@@ -74,7 +75,7 @@ exports.loginUser = (request, response) => {
     },(err, user) => {
         if (err){
             response.status(500).json({
-                status: "failed",
+                status: Commonconstants.FAILED,
                 message: 'Authentication Failed',
                 statusCode: 500
             });
@@ -82,7 +83,7 @@ exports.loginUser = (request, response) => {
         }
         if(!user){
             response.status(401).json({
-                status: "failed",
+                status: Commonconstants.FAILED,
                 message: "User Not Found ",
                 statusCode: 401
             })
@@ -102,7 +103,7 @@ exports.loginUser = (request, response) => {
                     }else{
                         console.log("User status is inactive");
                         response.status(403).json({
-                            status: "failed",
+                            status: Commonconstants.FAILED,
                             message: 'Your account is inactive. Please contact Admin.',                    
                             statusCode: 403      
                         });   
@@ -110,7 +111,7 @@ exports.loginUser = (request, response) => {
             }else{
                 console.log("Invalid Credentials. Authentiaction failed");
                 response.status(401).json({
-                    status: "failed",
+                    status: Commonconstants.FAILED,
                     message: 'Invalid Credentials, Please try again..',                    
                     statusCode: 401
                 });
@@ -129,14 +130,14 @@ exports.getUsersByRole = (request, response) => {
     }).then(result => {
         if(result.length <= 0){
             response.status(200).json({
-                status: "success",
+                status: Commonconstants.SUCCESS,
                 message: 'User details not found for this role and status',
                 statusCode: 200
             });
             return;
         }
         response.status(200).json({
-            status: "success",
+            status: Commonconstants.SUCCESS,
             message: 'User details fetched successfully',
             laws: result,
             statusCode: 200
@@ -144,7 +145,7 @@ exports.getUsersByRole = (request, response) => {
     }).catch(error => {
         console.log(`Failed to fetch ${userRole} with status as ${userStatus} details with the error: ${error}`);
         response.status(500).json({
-            status: "failed",
+            status: Commonconstants.FAILED,
             message: `Failed to fetch ${userRole} details`,
             statusCode: 500
         });
@@ -164,7 +165,7 @@ exports.updateUserStatus = (request, response) => {
         if (err) {
             console.log("Error in updating User status ", err);
             response.status(500).json({
-                status: "failed",
+                status: Commonconstants.FAILED,
                 message: "Failed to updating User status",
                 statusCode: 500
             });
@@ -173,14 +174,14 @@ exports.updateUserStatus = (request, response) => {
             console.log("User update status: ", result);
             if(result.modifiedCount <= 0){
                 response.status(500).json({
-                    status: "failed",
+                    status: Commonconstants.FAILED,
                     message: "Failed to updating User status",
                     statusCode: 500
                 });
             }else{
                 console.log("User updated successfully: ", result);
                 response.status(201).json({
-                    status: "success",
+                    status: Commonconstants.SUCCESS,
                     message: "User status updated successfully",
                     statusCode: 201
                 });
