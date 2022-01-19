@@ -2,7 +2,7 @@ const CaseDetails = require('../Models/CaseDetails');
 const Commonconstants = require('../Constants/Commonconstants');
 
 const formidable = require('formidable');
-const date = require('date-and-time');
+// const date = require('date-and-time');
 
 exports.fileACaseByPublic = (request, response) => {
     console.log("Filing a case begins");
@@ -28,7 +28,8 @@ exports.fileACaseByPublic = (request, response) => {
         caseDetails.case_files = files;
         const currentDate = new Date();
         caseDetails.created_time_stamp = currentDate;
-        caseDetails.created_date = date.format(currentDate,'YYYY/MM/DD HH:mm:ss');
+        // caseDetails.created_date = date.format(currentDate,'YYYY/MM/DD');
+        caseDetails.modified_date = currentDate;
         let publicUserId = fields.public_user_id;
         let ipcSectionId = fields.ipc_section_id;
         console.log("publicUserId : ", publicUserId);

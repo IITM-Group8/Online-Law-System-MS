@@ -40,7 +40,7 @@ const CaseSchema = new Schema(
             type: Date,
             required: true
         },
-        created_date:{
+        modified_date:{
             type: Date,
             required: true
         }
