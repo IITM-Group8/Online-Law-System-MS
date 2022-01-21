@@ -22,5 +22,6 @@ router.post('/court/courts', AdminController.udateCourtDetails);
 router.get('/court/courts/:area', AdminController.getListOfCourts);
 
 router.post('/case/public/fileACase', CaseController.fileACaseByPublic);
+router.get('/case/caseDetails/:case_status', CaseController.getCaseDetails);
 
 module.exports = router;
