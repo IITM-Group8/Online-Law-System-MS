@@ -98,7 +98,8 @@ exports.loginUser = (request, response) => {
                             _id: user.id
                         },
                         'SecureAPIs'),
-                        role: user.role
+                        userDetails: user,
+                        statusCode: 200
                     });             
                     }else{
                         console.log("User status is inactive");
