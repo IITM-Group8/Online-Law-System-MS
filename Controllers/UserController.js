@@ -98,7 +98,10 @@ exports.loginUser = (request, response) => {
                             _id: user.id
                         },
                         'SecureAPIs'),
-                        userDetails: user,
+                        userId: user.id,
+                        email: user.email,
+                        name: user.name,
+                        role: user.role,
                         statusCode: 200
                     });             
                     }else{
