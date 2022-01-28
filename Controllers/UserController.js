@@ -134,16 +134,34 @@ exports.getUsersByRole = (request, response) => {
     }).then(result => {
         if(result.length <= 0){
             response.status(200).json({
-                status: Commonconstants.SUCCESS,
+                status: Commonconstants.FAILED,
                 message: 'User details not found for this role and status',
-                statusCode: 200
+                statusCode: 401
             });
             return;
         }
+        var userDet = [];
+        for(resultData of result){
+            const det = {
+                id:  resultData._id,
+                name: resultData.name,
+                email: resultData.email,
+                mobile_no: resultData.mobile_no,
+                role: resultData.role,
+                age: resultData.age,
+                address: resultData.address,
+                city: resultData.city,
+                pincode: resultData.pincode,
+                expertize: resultData.expertize,
+                user_status: resultData.user_status  
+            }
+            userDet.push(det);
+        }
+        
         response.status(200).json({
             status: Commonconstants.SUCCESS,
             message: 'User details fetched successfully',
-            laws: result,
+            userDetails: userDet,
             statusCode: 200
         });
     }).catch(error => {
