@@ -142,6 +142,10 @@ exports.getUsersByRole = (request, response) => {
         }
         var userDet = [];
         for(resultData of result){
+            var update_user = 'InActive';
+            if(resultData.user_status !== 'Active'){
+                update_user = 'Active';
+            }
             const det = {
                 id:  resultData._id,
                 name: resultData.name,
@@ -153,7 +157,8 @@ exports.getUsersByRole = (request, response) => {
                 city: resultData.city,
                 pincode: resultData.pincode,
                 expertize: resultData.expertize,
-                user_status: resultData.user_status  
+                user_status: resultData.user_status ,
+                update_user: update_user
             }
             userDet.push(det);
         }

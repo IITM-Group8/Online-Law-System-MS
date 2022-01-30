@@ -81,27 +81,55 @@ exports.updateIPCLaw = (request, response) => {
 }
 
 exports.getIPCLaws = (request, response) => {
-    console.log("Fetch IPC Laws begins");
-    IPCLawDetails.find().then(result => {
+    console.log("Fetch IPC Laws begins ");
+    const ipcLawDetails = new IPCLawDetails(request.body);
+    const sectionNo = ipcLawDetails.section_no;
+    const description = ipcLawDetails.description;
+    
+    var input = {};
+    if(sectionNo != null && description != null){
+        input = {
+            section_no: sectionNo,
+            description: {$regex: '.*' + description + '.*'}
+        }
+    }else if(sectionNo != null && description == null){
+        input = {
+            section_no: sectionNo
+        }
+    }else if(sectionNo == null && description != null){
+        input = {
+            description: {$regex: '.*' + description + '.*'}
+        }
+    }
+    console.log("Input where details to get Law: ", input);
+    IPCLawDetails.find(input).then(result => {
         console.log("IPC laws result: ", result);
         if(result.length <= 0){
             response.status(200).json({
-                status: Commonconstants.Commonconstants.SUCCESS,
+                status: Commonconstants.FAILED,
                 message: 'No Records Found',
-                statusCode: 200
+                statusCode: 401
             });
             return;
         }
+        var lawDet = [];
+        for(resultData of result){
+            const det = {
+                section_no:  resultData.section_no,
+                description: resultData.description
+            }
+            lawDet.push(det);
+        }
         response.status(200).json({
-            status: Commonconstants.Commonconstants.SUCCESS,
+            status: Commonconstants.SUCCESS,
             message: 'IPC Laws fetched successfully',
-            laws: result,
+            laws: lawDet,
             statusCode: 200
         });
     }).catch(error => {
         console.log("Failed to fetch IPC Laws. ", error);
         response.status(500).json({
-            status: Commonconstants.Commonconstants.FAILED,
+            status: Commonconstants.FAILED,
             message: 'Failed to fetch IPC Laws',
             statusCode: 500
         });
@@ -120,7 +148,7 @@ exports.udateCourtDetails = (request, response) => {
         console.log("Existing obj ", obj);
         if (err) {
             response.status(500).json({
-                status: Commonconstants.Commonconstants.FAILED,
+                status: Commonconstants.FAILED,
                 message: "Failed in Validation",
                 statusCode: 500
             });
@@ -128,7 +156,7 @@ exports.udateCourtDetails = (request, response) => {
             if (obj != null) {
                 console.log("Court details already persisted", obj);
                 response.status(200).json({
-                    status: Commonconstants.Commonconstants.SUCCESS,
+                    status: Commonconstants.SUCCESS,
                     message: "Court details already persisted",
                     statusCode: 200
                 });
@@ -138,7 +166,7 @@ exports.udateCourtDetails = (request, response) => {
                 if (err) {
                     console.log("Error in persisting Court details ", err);
                     response.status(500).json({
-                        status: Commonconstants.Commonconstants.FAILED,
+                        status: Commonconstants.FAILED,
                         message: "Failed to persist Court details",
                         statusCode: 500
                     });
@@ -146,7 +174,7 @@ exports.udateCourtDetails = (request, response) => {
                 else {
                     console.log("Court details persisted successfully", result);
                     response.status(201).json({
-                        status: Commonconstants.Commonconstants.SUCCESS,
+                        status: Commonconstants.SUCCESS,
                         message: "Court details persisted successfully",
                         statusCode: 201
                     });

@@ -16,7 +16,7 @@ router.get('/user/usersByRole/:role/:user_status', UserController.getUsersByRole
 router.put('/user/userStatus', UserController.updateUserStatus);
 
 router.post('/laws/ipcLaw', AdminController.updateIPCLaw);
-router.get('/laws/ipcLaws', AdminController.getIPCLaws);
+router.post('/laws/ipcLaws', AdminController.getIPCLaws);
 
 router.post('/court/courts', AdminController.udateCourtDetails);
 router.get('/court/courts/:area', AdminController.getListOfCourts);
