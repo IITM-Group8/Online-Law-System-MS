@@ -86,11 +86,13 @@ exports.getIPCLaws = (request, response) => {
     const sectionNo = ipcLawDetails.section_no;
     const description = ipcLawDetails.description;
     
+    const descriptionQuery = { $regex : new RegExp('.*' +description + '.*', "i") };
+
     var input = {};
     if(sectionNo != null && description != null){
         input = {
             section_no: sectionNo,
-            description: {$regex: '.*' + description + '.*'}
+            description: descriptionQuery
         }
     }else if(sectionNo != null && description == null){
         input = {
@@ -98,7 +100,7 @@ exports.getIPCLaws = (request, response) => {
         }
     }else if(sectionNo == null && description != null){
         input = {
-            description: {$regex: '.*' + description + '.*'}
+            description: descriptionQuery
         }
     }
     console.log("Input where details to get Law: ", input);
