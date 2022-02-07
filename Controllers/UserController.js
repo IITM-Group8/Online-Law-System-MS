@@ -216,3 +216,68 @@ exports.updateUserStatus = (request, response) => {
         }
     });
 }
+
+exports.getLawyer = (request, response) => {
+    console.log("getLawyer begins");
+    const lawyerName = request.body.name;
+    const expertize = request.body.expertize;
+
+    const lawyerNameQuery = { $regex : new RegExp('.*' + lawyerName + '.*', "i") };
+    const expertizeQuery = { $regex : new RegExp('.*' + expertize + '.*', "i") };
+
+    var input = {};
+    if(lawyerName && expertize){
+        input = {
+            name: lawyerNameQuery,
+            expertize: expertizeQuery
+        }
+    }else if(lawyerName && !expertize){
+        input = {
+            name: lawyerNameQuery
+        }
+    }else if(!lawyerName && expertize){
+        input = {
+            expertize: expertizeQuery
+        }
+    }
+
+    UserDetails.find(input).then(result => {
+        if(result.length <= 0){
+            response.status(200).json({
+                status: Commonconstants.FAILED,
+                message: 'Lawyer details not found for this role and status',
+                statusCode: 401
+            });
+            return;
+        }
+        var userDet = [];
+        for(resultData of result){
+            const det = {
+                id:  resultData._id,
+                name: resultData.name,
+                email: resultData.email,
+                mobile_no: resultData.mobile_no,
+                role: resultData.role,
+                age: resultData.age,
+                address: resultData.address,
+                city: resultData.city,
+                pincode: resultData.pincode,
+                expertize: resultData.expertize                
+            }
+            userDet.push(det);
+        }
+        response.status(200).json({
+            status: Commonconstants.SUCCESS,
+            message: 'Lawyer details fetched successfully',
+            lawyerDetails: userDet,
+            statusCode: 200
+        });
+    }).catch(error => {
+        console.log(`Failed to fetch lawyer details. Error: ${error}`);
+        response.status(500).json({
+            status: Commonconstants.FAILED,
+            message: 'Failed to fetch Lawyer details',
+            statusCode: 500
+        });
+    });
+}

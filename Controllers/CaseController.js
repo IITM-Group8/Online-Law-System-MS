@@ -89,13 +89,48 @@ exports.fileACaseByPublic = (request, response) => {
     });   
 }
 
-// Work in progress
 exports.getCaseDetails = (request, response) => {
-    const caseStatus = request.params.case_status;
-    console.log("Fetch Case details begins for case status: ", caseStatus);
-    CaseDetails.find({
-        case_status: caseStatus
-    }).then(result => {
+    const caseDetails = request.body;
+    console.log('Fetch Case details begins ');
+    const caseStatus = caseDetails.caseStatus;
+    const publicUserId = caseDetails.publicUserId;
+    const lawyerUserId = caseDetails.lawyerUserId;
+
+    if(publicUserId && lawyerUserId){
+        response.status(200).json({
+            status: Commonconstants.SUCCESS,
+            message: 'Invalid Input. Either Public User or Lawyer can access individually.',
+            statusCode: 500
+        });
+        return;
+    }
+    
+    var input = {};
+    if(publicUserId && caseStatus){
+        input = {
+            _public_user_id: publicUserId,
+            case_status: caseStatus
+        }
+    }else if(lawyerUserId && caseStatus){
+        input = {
+            _lawyer_id: lawyerUserId,
+            case_status: caseStatus
+        }
+    }else if(publicUserId && !caseStatus){
+        input = {
+            _public_user_id: publicUserId
+        }
+    }else if(lawyerUserId && !caseStatus){
+        input = {
+            _lawyer_id: lawyerUserId,
+        }
+    }else if(caseStatus){
+        input = {
+            case_status: caseStatus
+        }
+    }
+    console.log("Query to get case details: ", input);
+    CaseDetails.find(input).then(result => {
         if (result.length <= 0) {
             response.status(200).json({
                 status: Commonconstants.SUCCESS,
@@ -120,3 +155,57 @@ exports.getCaseDetails = (request, response) => {
     });
 }
 
+exports.updateCase = (request, response) => {
+    console.log("Update Case begins");
+    const caseDetails = request.body;
+    const caseID = caseDetails.caseId;
+    const caseStatus = caseDetails.caseStatus;
+
+    CaseDetails.findOne({
+        "_id": caseID
+    }, function (err, obj) {
+        if (err) {
+            response.status(500).json({
+                status: Commonconstants.FAILED,
+                message: "Failed in Validation",
+                statusCode: 500
+            });
+        }else {
+            if (obj != null && obj) {
+                console.log("Updating case starts");
+                const currentDate = new Date();
+                CaseDetails.updateOne({
+                    "_id":caseID
+                }, {
+                    case_status: caseStatus,
+                    modified_date: currentDate
+                }, function (err, result) {
+                    if (err) {
+                        console.log("Error in updating Case status", err);
+                        response.status(200).json({
+                            status: Commonconstants.FAILED,
+                            message: "Failed to update Case status",
+                            statusCode: 500
+                        });
+                    }
+                    else {
+                        console.log("Case status updated result: ", result);
+                        if(result.modifiedCount <= 0){
+                            response.status(500).json({
+                                status: Commonconstants.FAILED,
+                                message: "Failed to Update Case status",
+                                statusCode: 500
+                            });
+                        }else{
+                            response.status(201).json({
+                                status: Commonconstants.SUCCESS,
+                                message: "Case Status updated successfully",
+                                statusCode: 201
+                            });
+                        }                        
+                    }
+                });
+            }       
+        }
+    });
+}
