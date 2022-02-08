@@ -1,48 +1,85 @@
 const CaseDetails = require('../Models/CaseDetails');
+const IPCLawDetails = require('../Models/IPCLawDetails');
 const Commonconstants = require('../Constants/Commonconstants');
 
 
 exports.generateReport = (request, response) => {
     const caseDetails = request.body;
     console.log('Generate report begins ');
+    const ipcSection = caseDetails.ipcSection;
+    
+    var ipcSectionID = '';
+    if (ipcSection) {
+        IPCLawDetails.findOne({
+            section_no: ipcSection
+        }, function (err, obj) {
+            console.log("Existing obj ", obj);
+            if (err) {
+                response.status(500).json({
+                    status: Commonconstants.FAILED,
+                    message: "Failed in Validation",
+                    statusCode: 500
+                });
+            } else {
+                if (obj != null) {
+                    console.log("Section no. matches");
+                    ipcSectionID = obj['_id'];
+                } else {
+                    response.status(200).json({
+                        status: Commonconstants.FAILED,
+                        message: 'No Records Found for this IPC section',
+                        statusCode: 401
+                    });
+                    return;
+                }
+                console.log("ipcSectionID : ", ipcSectionID);
+                fetchCaseDetailsByDate(caseDetails, ipcSectionID, response);
+            }
+        });
+    }else{
+        fetchCaseDetailsByDate(caseDetails, ipcSectionID, response);
+    }
+}
+
+function fetchCaseDetailsByDate(caseDetails, ipcSectionID, response){
+    console.log("fetchCaseDetailsByDate begins for ", caseDetails, ipcSectionID);
     const fromDate = caseDetails.fromDate;
     const toDate = caseDetails.toDate;
-    const ipcSection = caseDetails.toDate;
-
-    
-    
     var input = {};
-    if(publicUserId && caseStatus){
+    if (fromDate && toDate && ipcSectionID) {
         input = {
-            _public_user_id: publicUserId,
-            case_status: caseStatus
+            _ipc_section_id: ipcSectionID,
+            created_time_stamp: {
+                $gte: new Date(fromDate),
+                $lt: new Date(toDate)
+            }
         }
-    }else if(lawyerUserId && caseStatus){
+    } else if (fromDate && toDate && !ipcSectionID) {
         input = {
-            _lawyer_id: lawyerUserId,
-            case_status: caseStatus
+            created_time_stamp: {
+                $gte: new Date(fromDate),
+                $lt: new Date(toDate)
+            }
         }
-    }else if(publicUserId && !caseStatus){
+    } else if (fromDate && !toDate && ipcSectionID) {
         input = {
-            _public_user_id: publicUserId
+            _ipc_section_id: ipcSectionID,
+            created_time_stamp: {
+                $gte: new Date(fromDate)
+            }
         }
-    }else if(lawyerUserId && !caseStatus){
+    } else if (fromDate && !toDate && !ipcSectionID) {
         input = {
-            _lawyer_id: lawyerUserId,
+            created_time_stamp: {
+                $gte: new Date(fromDate)
+            }
         }
-    }else if(caseStatus){
+    } else if (!fromDate && !toDate && ipcSectionID) {
         input = {
-            case_status: caseStatus
+            _ipc_section_id: ipcSectionID
         }
     }
-    console.log("Query to get case details: ", input);
-
-    CaseDetails.aggregate.lookup({
-        from: "case_details", 
-        localField: "_id",
-        foreignField: "_ipc_section_id",
-        as: "case_details"
-      })
+    console.log("input query to generate reports: ", input);
 
     CaseDetails.find(input).then(result => {
         if (result.length <= 0) {

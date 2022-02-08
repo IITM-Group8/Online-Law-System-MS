@@ -187,9 +187,26 @@ exports.udateCourtDetails = (request, response) => {
 }
 
 exports.getListOfCourts = (request, response) => {
-    const areaForCourt = request.params.area;
-    console.log("Fetch List Of courts by area begins for : ", areaForCourt);
-    CourtDetails.find({area: areaForCourt}).then(result => {
+    const areaForCourt = request.body.area;
+    const pincodeForCourt = request.body.pincode;
+
+    var input = {};
+    if(areaForCourt && pincodeForCourt){
+        input = {
+            area: areaForCourt,
+            pincode: pincodeForCourt
+        }
+    }else if(areaForCourt && !pincodeForCourt){
+        input = {
+            area: areaForCourt
+        }
+    }else if(!areaForCourt && pincodeForCourt){
+        input = {
+            pincode: pincodeForCourt
+        }
+    }
+    console.log("Fetch List Of courts by area begins for : ", input);
+    CourtDetails.find(input).then(result => {
         if(result.length <= 0){
             response.status(200).json({
                 status: Commonconstants.SUCCESS,
