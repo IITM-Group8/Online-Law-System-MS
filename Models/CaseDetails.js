@@ -18,11 +18,11 @@ const CaseSchema = new Schema(
             // type: String,
             // required: true
         },
-        _ipc_section_id:{
-            type: Schema.Types.ObjectId,
-            ref: IPCLawDetails,
-            // type: String,
-            // required: true
+        ipc_section:{
+            // type: Schema.Types.ObjectId,
+            // ref: IPCLawDetails,
+            type: Number,
+            required: true
         },
         case_description:{
             type: String,
