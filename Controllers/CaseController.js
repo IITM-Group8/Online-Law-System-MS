@@ -1,9 +1,9 @@
 const CaseDetails = require('../Models/CaseDetails');
 const Commonconstants = require('../Constants/Commonconstants');
+var Binary = require('mongodb').Binary;
 
 const formidable = require('formidable');
 const fs = require("fs");
-// const date = require('date-and-time');
 
 exports.fileACaseByPublic = (request, response) => {
     console.log("Filing a case begins");
@@ -12,8 +12,6 @@ exports.fileACaseByPublic = (request, response) => {
         var form = new formidable.IncomingForm({ multiples: true });
         //var form = formidable({ multiples: true });
         form.parse(request, function (err, fields, files) {
-            console.log("fields : ", fields);
-            console.log("files : ", files);
             if (err) {
                 console.error(err.message);
                 response.status(500).json({
@@ -28,22 +26,41 @@ exports.fileACaseByPublic = (request, response) => {
             caseDetails._lawyer_id = fields.lawyer_id;
             caseDetails.ipc_section = fields.ipc_section;
             caseDetails.case_description = fields.case_description;
-            console.log("details: ---- : ", fields.public_user_id, fields.lawyer_id, fields.ipc_section,
-                fields.case_description);
             caseDetails.case_status = 'New';
             let caseFileList = [];
-            if (files.case_files) {
+            if (files.case_files && files.case_files.length > 1) {
                 for (persistentFile of files.case_files) {
                     var file = fs.readFileSync(persistentFile.filepath);
-                    var encodedFile = file.toString('base64');
+                    // var encodedFile = file.toString('base64');
                     var finalFile = {
                         contentType: persistentFile.mimetype,
-                        file: Buffer.from(encodedFile, 'base64')
+                        file: Buffer.from(file)
+                        // file: Binary(file)
+                        // file: file
                     };
                     caseFileList.push(finalFile);
                 }
-                caseDetails.case_files = caseFileList;
+            } else {
+                var file = fs.readFileSync(files.case_files.filepath);
+                // var file = fs.readFileSync(files.case_files.filepath, "utf-8", function (err, data) {
+                //     if (err) {
+                //         console.error("Failed to read files. ", err);
+                //         response.status(500).json({
+                //             status: Commonconstants.FAILED,
+                //             message: "Failed to read Files",
+                //             statusCode: 500
+                //         });
+                //     };
+                //     file = data;
+                // });
+
+                var finalFile = {
+                    contentType: files.case_files.mimetype,
+                    file: Buffer.from(file)
+                };
+                caseFileList.push(finalFile);
             }
+            caseDetails.case_files = caseFileList;
             const currentDate = new Date();
             caseDetails.created_time_stamp = currentDate;
             // caseDetails.created_date = date.format(currentDate,'YYYY/MM/DD');
@@ -52,7 +69,7 @@ exports.fileACaseByPublic = (request, response) => {
             console.log("CaseDetails findone starting");
             CaseDetails.findOne({
                 "_public_user_id": caseDetails._public_user_id,
-                "_ipc_section_id": caseDetails._ipc_section_id,
+                "ipc_section": caseDetails.ipc_section,
             }, function (err, obj) {
                 if (err) {
                     response.status(500).json({
@@ -158,10 +175,50 @@ exports.getCaseDetails = (request, response) => {
                 });
                 return;
             }
+            console.log("result ", result);            
+
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            var caseDet = [];
+            for (resultData of result) {
+
+                const month = resultData.created_time_stamp.getUTCMonth();
+                const createdDate = resultData.created_time_stamp.getUTCDate() + "-" + months[month] + "-" + resultData.created_time_stamp.getUTCFullYear();
+
+                var fileContent = undefined;
+                if (resultData.case_files != null && resultData.case_files) {
+                    const caseFiles = resultData.case_files;
+                    for (let files of caseFiles) {
+                        // console.log("resultData content type: ", files.contentType);
+                        // console.log("resultData file type: ", files.file);
+                        // var file = fs.readFileSync(files.file, "utf-8", function (err, data) {
+                        //     if (err) {
+                        //         console.error("Failed to read files. ", err);
+                        //         response.status(500).json({
+                        //             status: Commonconstants.FAILED,
+                        //             message: "Failed to read Files",
+                        //             statusCode: 500
+                        //         });
+                        //     };
+                        //     file = data;
+                        // });
+                    }
+                    fileContent = resultData.case_files;
+                }
+                const det = {
+                    id: resultData["_id"],
+                    caseFiles: fileContent,
+                    ipcSection: resultData.ipc_section,
+                    caseDescription: resultData.case_description,
+                    caseStatus: resultData.case_status,
+                    createdDate: createdDate
+                }
+                caseDet.push(det);
+            }
             response.status(200).json({
                 status: Commonconstants.SUCCESS,
                 message: 'Case details fetched successfully',
-                laws: result,
+                case: caseDet,
                 statusCode: 200
             });
         }).catch(error => {
@@ -189,6 +246,8 @@ exports.updateCase = (request, response) => {
         const caseID = caseDetails.caseId;
         const caseStatus = caseDetails.caseStatus;
 
+        console.log("caseID : caseStatus : ", caseID, caseStatus);
+
         CaseDetails.findOne({
             "_id": caseID
         }, function (err, obj) {
@@ -198,6 +257,7 @@ exports.updateCase = (request, response) => {
                     message: "Failed in Validation",
                     statusCode: 500
                 });
+                return;
             } else {
                 if (obj != null && obj) {
                     console.log("Updating case starts");
@@ -215,6 +275,7 @@ exports.updateCase = (request, response) => {
                                 message: "Failed to update Case status",
                                 statusCode: 500
                             });
+                            return;
                         }
                         else {
                             console.log("Case status updated result: ", result);
@@ -224,12 +285,14 @@ exports.updateCase = (request, response) => {
                                     message: "Failed to Update Case status",
                                     statusCode: 500
                                 });
+                                return;
                             } else {
                                 response.status(201).json({
                                     status: Commonconstants.SUCCESS,
                                     message: "Case Status updated successfully",
                                     statusCode: 201
                                 });
+                                return;
                             }
                         }
                     });
@@ -243,5 +306,6 @@ exports.updateCase = (request, response) => {
             message: "Failed to update Case status",
             statusCode: 500
         });
+        return;
     }
 }

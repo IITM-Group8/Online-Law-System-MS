@@ -14,6 +14,7 @@ router.post('/user/login', UserController.loginUser);
 router.get('/user/usersByRole/:role/:user_status', UserController.getUsersByRole);
 router.put('/user/userStatus', UserController.updateUserStatus);
 router.post('/user/lawyers', UserController.getLawyer);
+router.post('/user/password', UserController.generatePassword);
 
 router.post('/laws/ipcLaw', AdminController.updateIPCLaw);
 router.post('/laws/ipcLaws', AdminController.getIPCLaws);
