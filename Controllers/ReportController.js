@@ -97,7 +97,7 @@ function fetchCaseDetailsByDate(caseDetails, ipcSectionID, response) {
                 response.status(200).json({
                     status: Commonconstants.SUCCESS,
                     message: 'No Records Found',
-                    statusCode: 200
+                    statusCode: 401
                 });
                 return;
             }

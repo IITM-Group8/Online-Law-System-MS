@@ -187,22 +187,26 @@ exports.getCaseDetails = (request, response) => {
 
                 var fileContent = undefined;
                 if (resultData.case_files != null && resultData.case_files) {
-                    const caseFiles = resultData.case_files;
-                    for (let files of caseFiles) {
-                        // console.log("resultData content type: ", files.contentType);
-                        // console.log("resultData file type: ", files.file);
-                        // var file = fs.readFileSync(files.file, "utf-8", function (err, data) {
-                        //     if (err) {
-                        //         console.error("Failed to read files. ", err);
-                        //         response.status(500).json({
-                        //             status: Commonconstants.FAILED,
-                        //             message: "Failed to read Files",
-                        //             statusCode: 500
-                        //         });
-                        //     };
-                        //     file = data;
-                        // });
-                    }
+
+                    //TODO:
+                    //Currently supporting only text file. Yet to do for the other types of files.
+
+                    // const caseFiles = resultData.case_files;
+                    // for (let files of caseFiles) {
+                    //     console.log("resultData content type: ", files.contentType);
+                    //     console.log("resultData file type: ", files.file);
+                    //     var file = fs.readFileSync(files.file, "utf-8", function (err, data) {
+                    //         if (err) {
+                    //             console.error("Failed to read files. ", err);
+                    //             response.status(500).json({
+                    //                 status: Commonconstants.FAILED,
+                    //                 message: "Failed to read Files",
+                    //                 statusCode: 500
+                    //             });
+                    //         };
+                    //         file = data;
+                    //     });
+                    // }
                     fileContent = resultData.case_files;
                 }
                 const det = {
