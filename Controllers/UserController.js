@@ -357,7 +357,7 @@ exports.generatePassword = (request, response) => {
             }
             var newPwd = bcrypt.hashSync(newPassword, 10);
 
-            UserDetails.updateOne({ "_id": userId }, { hashPassword: newPwd }, function (err, result) {
+            UserDetails.updateOne({ "email": email }, { hashPassword: newPwd }, function (err, result) {
                 if (err) {
                     console.log("Error in updating User password ", err);
                     response.status(500).json({
