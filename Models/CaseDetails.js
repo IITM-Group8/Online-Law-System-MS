@@ -30,7 +30,7 @@ const CaseSchema = new Schema(
         },
         case_files:{
             type: Array,
-            data: Buffer,
+            data: String,
             required: false
         },
         case_status:{
