@@ -21,7 +21,7 @@ app.use((request, response, next) => {
 app.use('/', routes);
 
 mongoose.connect(
-    'mongodb+srv://team8:Team8Go@cluster0.et3ws.mongodb.net/OnlineLawSystem?retryWrites=true&w=majority',
+    'mongodb+srv://XXXXXX:XXXXXX/OnlineLawSystem?retryWrites=true&w=majority',
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
