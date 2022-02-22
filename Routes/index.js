@@ -26,6 +26,6 @@ router.post('/case/public/fileACase', CaseController.fileACaseByPublic);
 router.post('/case/caseDetails', CaseController.getCaseDetails);
 router.put('/case/caseStatus', CaseController.updateCase);
 
-router.post('/report/generateReport', ReportController.generateReport);
+router.post('/reports/generateReport', ReportController.generateReport);
 
 module.exports = router;

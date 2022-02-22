@@ -10,7 +10,8 @@ exports.fileACaseByPublic = (request, response) => {
     try {
         var caseDetails = new CaseDetails();
         var form = new formidable.IncomingForm({ multiples: true });
-        //var form = formidable({ multiples: true });
+        form.keepExtensions = true;
+        // var form = formidable({ multiples: true });
         form.parse(request, function (err, fields, files) {
             if (err) {
                 console.error(err.message);
@@ -30,33 +31,20 @@ exports.fileACaseByPublic = (request, response) => {
             let caseFileList = [];
             if (files.case_files && files.case_files.length > 1) {
                 for (persistentFile of files.case_files) {
-                    var file = fs.readFileSync(persistentFile.filepath);
-                    // var encodedFile = file.toString('base64');
+                    var file = fs.readFileSync(persistentFile.filepath, 'base64');
                     var finalFile = {
                         contentType: persistentFile.mimetype,
-                        file: Buffer.from(file)
+                        file: file
                         // file: Binary(file)
                         // file: file
                     };
                     caseFileList.push(finalFile);
                 }
             } else {
-                var file = fs.readFileSync(files.case_files.filepath);
-                // var file = fs.readFileSync(files.case_files.filepath, "utf-8", function (err, data) {
-                //     if (err) {
-                //         console.error("Failed to read files. ", err);
-                //         response.status(500).json({
-                //             status: Commonconstants.FAILED,
-                //             message: "Failed to read Files",
-                //             statusCode: 500
-                //         });
-                //     };
-                //     file = data;
-                // });
-
+                var file = fs.readFileSync(files.case_files.filepath, 'base64');
                 var finalFile = {
                     contentType: files.case_files.mimetype,
-                    file: Buffer.from(file)
+                    file: file
                 };
                 caseFileList.push(finalFile);
             }
@@ -101,7 +89,7 @@ exports.fileACaseByPublic = (request, response) => {
                             return;
                         }
                         else {
-                            console.log("Case filed successfully", result);
+                            console.log("Case filed successfully", result._id);
                             response.status(201).json({
                                 status: Commonconstants.SUCCESS,
                                 message: "Case filed successfully",
@@ -175,37 +163,22 @@ exports.getCaseDetails = (request, response) => {
                 });
                 return;
             }
-            console.log("result ", result);            
-
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
             var caseDet = [];
             for (resultData of result) {
-
                 const month = resultData.created_time_stamp.getUTCMonth();
                 const createdDate = resultData.created_time_stamp.getUTCDate() + "-" + months[month] + "-" + resultData.created_time_stamp.getUTCFullYear();
 
                 var fileContent = undefined;
                 if (resultData.case_files != null && resultData.case_files) {
-
                     //TODO:
                     //Currently supporting only text file. Yet to do for the other types of files.
-
+                    // var tempList = [];
                     // const caseFiles = resultData.case_files;
                     // for (let files of caseFiles) {
                     //     console.log("resultData content type: ", files.contentType);
-                    //     console.log("resultData file type: ", files.file);
-                    //     var file = fs.readFileSync(files.file, "utf-8", function (err, data) {
-                    //         if (err) {
-                    //             console.error("Failed to read files. ", err);
-                    //             response.status(500).json({
-                    //                 status: Commonconstants.FAILED,
-                    //                 message: "Failed to read Files",
-                    //                 statusCode: 500
-                    //             });
-                    //         };
-                    //         file = data;
-                    //     });
+                    //     tempList.push(file);
                     // }
                     fileContent = resultData.case_files;
                 }

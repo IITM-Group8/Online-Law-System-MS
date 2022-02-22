@@ -340,11 +340,11 @@ exports.getLawyer = (request, response) => {
 exports.generatePassword = (request, response) => {
     console.log("generatePassword begins");
     try {
-        const userId = request.body.userId;
+        const email = request.body.email;
         const newPassword = request.body.newPassword;
         
         UserDetails.findOne({
-            "_id": userId
+            "email": email
         }).then(result => {
             console.log("result ", result);
             if (result.length <= 0) {
@@ -357,7 +357,7 @@ exports.generatePassword = (request, response) => {
             }
             var newPwd = bcrypt.hashSync(newPassword, 10);
 
-            UserDetails.updateOne({ "_id": userId }, { hashPassword: newPwd }, function (err, result) {
+            UserDetails.updateOne({ "email": email }, { hashPassword: newPwd }, function (err, result) {
                 if (err) {
                     console.log("Error in updating User password ", err);
                     response.status(500).json({
